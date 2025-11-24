@@ -28,11 +28,24 @@ function Router() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Check auth on mount and when localStorage changes
   useEffect(() => {
-    const authUser = localStorage.getItem("authUser");
-    setIsAuthenticated(!!authUser);
-    setIsLoading(false);
+    const checkAuth = () => {
+      const authUser = localStorage.getItem("authUser");
+      setIsAuthenticated(!!authUser);
+      setIsLoading(false);
+    };
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
   }, []);
+
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("authUser");
+    setIsAuthenticated(false);
+    setLocation("/auth");
+  };
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -43,27 +56,32 @@ function Router() {
     return null;
   }
 
+  // Pass handleLogout to Profile or Navbar as needed
   return (
-    <Switch>
-      <Route path="/auth" component={Auth} />
-      <Route path="/" component={Home} />
-      <Route path="/projects" component={Projects} />
-      <Route path="/explore" component={Explore} />
-      <Route path="/article/:id" component={ArticleDetail} />
-      <Route path="/story/:id" component={SuccessStoryDetail} />
-      <Route path="/inquiries" component={Inquiries} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/builders" component={Builders} />
-      <Route path="/builder/:id" component={BuilderDetail} />
-      <Route path="/services/:category" component={ServiceCategory} />
-      <Route path="/planning" component={Planning} />
-      <Route path="/planning/:type" component={PlanningVendors} />
-      <Route path="/approvals" component={Approvals} />
-      <Route path="/approval/:id" component={ApprovalDetail} />
-      <Route path="/materials" component={Materials} />
-      <Route path="/guide" component={BuildingGuide} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      {/* Example: Add a logout button somewhere in your UI */}
+      {/* <button onClick={handleLogout}>Logout</button> */}
+      <Switch>
+        <Route path="/auth" component={Auth} />
+        <Route path="/" component={Home} />
+        <Route path="/projects" component={Projects} />
+        <Route path="/explore" component={Explore} />
+        <Route path="/article/:id" component={ArticleDetail} />
+        <Route path="/story/:id" component={SuccessStoryDetail} />
+        <Route path="/inquiries" component={Inquiries} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/builders" component={Builders} />
+        <Route path="/builder/:id" component={BuilderDetail} />
+        <Route path="/services/:category" component={ServiceCategory} />
+        <Route path="/planning" component={Planning} />
+        <Route path="/planning/:type" component={PlanningVendors} />
+        <Route path="/approvals" component={Approvals} />
+        <Route path="/approval/:id" component={ApprovalDetail} />
+        <Route path="/materials" component={Materials} />
+        <Route path="/guide" component={BuildingGuide} />
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 
